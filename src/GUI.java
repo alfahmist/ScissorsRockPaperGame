@@ -3,6 +3,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Console;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -10,18 +11,15 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
-public class GUI extends JFrame {
+public class GUI extends JFrame implements ActionListener {
 
     int height = 500;
     int width = 400;
 
-    // TODO Auto-generated method stub
-    JLabel computerLabel = new JLabel();
-    JLabel playerLabel = new JLabel();
-    JLabel computerChoice = new JLabel();
-    JButton scissorsButton = new JButton();
-    JButton rockButton = new JButton();
-    JButton paperButton = new JButton();
+    protected JLabel computerLabel, playerLabel, computerChoose;
+    protected JButton scissorsButton, rockButton, paperButton;
+
+    Logic logic;
 
     public GUI() {
         super("Scissors Rock Paper");
@@ -29,23 +27,27 @@ public class GUI extends JFrame {
         setLayout(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        logic = new Logic();
         addGUIComponents();
     }
 
     private void addGUIComponents() {
 
+        computerChoose = new JLabel();
+        computerLabel = new JLabel();
+        playerLabel = new JLabel();
+
         scoreLabel(computerLabel, "Computer: 0", 0, 30);
         scoreLabel(playerLabel, "Player: 0", 0, height - 230);
-        computerChoice(computerChoice, "?");
-        gameButton(scissorsButton, "Scissors", 10);
-        gameButton(rockButton, "Rock", 10 + width / 3);
-        gameButton(paperButton, "Paper", 10 + width - width / 3);
-        // showDialog("Result", "You Win!");
+        computerChoice(computerChoose, "?");
+        gameButton(scissorsButton, "Scissors", 5);
+        gameButton(rockButton, "Rock", 5 + width / 3);
+        gameButton(paperButton, "Paper", 5 + width - width / 3);
     }
 
     private void scoreLabel(JLabel label, String title, int x, int y) {
 
-        label = new JLabel(title);
+        label.setText(title);
         label.setBounds(x, y, width, 30);
         label.setFont(new Font("Dialog", Font.BOLD, 18));
         label.setHorizontalAlignment(SwingConstants.CENTER);
@@ -53,7 +55,7 @@ public class GUI extends JFrame {
     }
 
     private void computerChoice(JLabel label, String title) {
-        label = new JLabel(title);
+        label.setText(title);
         label.setBounds((width / 2) - 100 / 2, 80, 100, 80);
         label.setFont(new Font("Dialog", Font.BOLD, 18));
         label.setHorizontalAlignment(SwingConstants.CENTER);
@@ -64,13 +66,13 @@ public class GUI extends JFrame {
 
     private void gameButton(JButton button, String buttonName, int x) {
         button = new JButton(buttonName);
-        button.setBounds(x, height - 150, width / 4, 50);
+        button.setBounds(x, height - 150, width / 4 + 10, 50);
         button.setFont(new Font("Dialog", Font.PLAIN, 18));
-        // button.addActionListener(this);
+        button.addActionListener((ActionListener) this);
         add(button);
     }
 
-    private void showDialog(String title, String message) {
+    public void showDialog(String title, String message) {
         JDialog dialog = new JDialog(this, title, true);
         dialog.setSize(200, 100);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -84,7 +86,7 @@ public class GUI extends JFrame {
         JButton tryAgainButton = new JButton("Try Again");
         tryAgainButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                computerChoice.setText("?");
+                computerChoose.setText("?");
 
                 dialog.dispose();
             }
@@ -93,6 +95,18 @@ public class GUI extends JFrame {
         dialog.add(tryAgainButton, BorderLayout.SOUTH);
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String playerChoice = e.getActionCommand().toString();
+        String result = logic.play(playerChoice);
+        computerChoose.setText(logic.getComputerChoice());
+        System.out.println("Computer: " + logic.getComputerChoice());
+        computerLabel.setText("Computer: " + logic.getComputerScore());
+        playerLabel.setText("Player: " + logic.getPlayerScore());
+
+        showDialog("Result", result);
     }
 
 }

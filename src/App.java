@@ -5,6 +5,7 @@ public class App {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 GUI gui = new GUI();
+
                 gui.setVisible(true);
             }
         });
